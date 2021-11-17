@@ -21,6 +21,13 @@ Paul NGUYEN DIT SYVALA
 `paul.nguyen_dit_syvala@etu.sorbonne-universite.fr`
 
 
+# workspace #
+
+gnache workspace name : daar-longbow
+
+gnache mnemonic : width color iron acid spell churn top law virus october west over
+
+
 # Cas d'utilisations #
 
 ...
