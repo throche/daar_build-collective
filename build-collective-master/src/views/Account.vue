@@ -23,13 +23,13 @@
       >
         <div class="explanations">
           <p>You currently have {{ account.balance }} tokens on your account. Add some tokens to your account here. Enjoy, it's Free!</p>
-          <p>Enter here the number of token to receive :</p>
+          <p>Enter here the number of token to receive, then press enter:</p>
           <form @submit.prevent="addTokens">
             <input
             type="text"
             class="input-username"
             v-model="newTokens"
-            placeholder="Amount"
+            placeholder="Type amount here"
             />
           </form>
         </div>
@@ -44,7 +44,8 @@
         :blue="true"
       >
         <div class="explanations">
-          <p>You can now create a project</p>
+          <p>
+          Create a new project by entering its name bellow. The project will be listed among the other projects. Every project has a balance account which contributors can fund.</p>
           <form @submit.prevent="createProject">
             <input
             type="text"
@@ -85,14 +86,27 @@
     </div>
     <div class="card-home-wrapper">
       <card
-        :title="'Found a project'"
+        :title="'Fund a project'"
         :subtitle="'Become a collaborator !'"
         :gradient="true"
         :blue="true"
       >
         <div class="explanations">
-          You can fund a project  
-          <button class="button-link" @click="fundProject">here</button>.             
+          <p>Enter the name of the project which you want to add funds and the amount.</p>
+          <p>By adding tokens to the project, you will become a contributor.</p>
+          <input
+          type="text"
+          class="input-username"
+          v-model="project_name"
+          placeholder="Type exact project name"
+          />
+          <input
+          type="text"
+          class="input-username"
+          v-model="donation"
+          placeholder="Type amount here"
+          />
+          <button class="button-link" @click="fundProject">Confirm</button>         
         </div>
 
       </card>
@@ -123,7 +137,8 @@ export default defineComponent({
     const projects = [""]
     const display = false
     const newTokens = 0
-    return { account, username, project_name, nbProjects, projects, display, newTokens}
+    const donation = 0
+    return { account, username, project_name, nbProjects, projects, display, newTokens, donation}
   },  
   methods: {
 
@@ -156,20 +171,21 @@ export default defineComponent({
       const { contract, newTokens } = this
       await contract.methods.addBalance(newTokens).send()
       await this.updateAccount()
+      this.newTokens = 0
     },
     async createProject() {
       const { contract, project_name } = this
-      const p_name = project_name.trim().replace(/ /g, '_')
-      await contract.methods.createProject(p_name).send()
+      await contract.methods.createProject(project_name).send()
       await this.updateProjects()
       this.project_name = ''
     },
     async fundProject() {
-      const { contract, address } = this
-      await contract.methods.addBalanceToProject(200, 0, address).send()
+      const { contract, address, project_name, donation} = this
+      await contract.methods.addBalanceToProject(donation, project_name, address).send()
       await this.updateProjects()
       await this.updateAccount()
-
+      this.project_name = ''
+      this.donation = 0
     },
   },
   async mounted() {

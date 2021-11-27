@@ -57,13 +57,27 @@ contract BuildCollective is Ownable {
     projectCount++;
   }
 
-  function addBalanceToProject(uint256 amount, uint projectIndex, address addr) public returns (bool) {
+  function addBalanceToProject(uint256 amount, string memory projectName, address addr) public returns (bool) {
     require(users[addr].balance >= amount);
-    require(projectIndex < projectCount);
-    require(isCollaborator(projectIndex, addr));
-    projects[projectIndex].balance += amount;
-    users[addr].balance -= amount;
-    return true;
+    bool exist;
+    uint projectIndex;
+    (exist,projectIndex) = getProjectIndex(projectName);
+    if(exist) {
+      require(isCollaborator(projectIndex, addr));
+      projects[projectIndex].balance += amount;
+      users[addr].balance -= amount;
+      return true;
+    }
+    return false;
+  }
+
+  function getProjectIndex(string memory projectName) private returns (bool,uint){
+    for(uint i = 0; i < projectCount; i++){
+      if (stringsEquals(projects[i].projectName, projectName)){
+        return (true,i);
+      }
+    }
+    return (false,0);
   }
 
   function isCollaborator(uint projectIndex, address addr) private returns (bool){
@@ -74,5 +88,16 @@ contract BuildCollective is Ownable {
     }
     return false;
   }
+
+  function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
+    bytes memory b1 = bytes(s1);
+    bytes memory b2 = bytes(s2);
+    uint256 l1 = b1.length;
+    if (l1 != b2.length) return false;
+    for (uint256 i=0; i<l1; i++) {
+        if (b1[i] != b2[i]) return false;
+    }
+    return true;
+}
 
 }
