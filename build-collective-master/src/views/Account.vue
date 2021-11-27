@@ -35,6 +35,58 @@
         </div>
       </card>
     </div>
+
+    <div class="card-home-wrapper">
+      <card
+        :title="account.username"
+        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :gradient="true"
+      >
+        <div class="explanations">
+          You can now create a project   
+          <button class="button-link" @click="createProject">here</button>.             
+        </div>
+        
+      </card>
+    </div>
+    <div class="card-home-wrapper">
+      <card
+        :title="account.username"
+        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :gradient="true"
+      >
+        <div class="explanations">
+          Here is the project list : 
+          <button class="button-link" @click="updateProjects">diplay projects</button>.             
+           <div class="explanations" v-if="display">
+
+            <div class="explanations" v-for="(p, index) in projects"
+              :key="index">
+         
+                project name : {{p.projectName}}<br>
+                creator : {{p.creatorUser}}<br>
+                balance : {{p.balance}}<br>
+                contributors : {{p.collaborators}}<br>
+
+            </div>  
+            </div>  
+      
+        </div>
+      </card>
+    </div>
+    <div class="card-home-wrapper">
+      <card
+        :title="account.username"
+        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :gradient="true"
+      >
+        <div class="explanations">
+          You can fund a project  
+          <button class="button-link" @click="fundProject">here</button>.             
+        </div>
+
+      </card>
+    </div>
   </div>
 </template>
 
@@ -52,15 +104,34 @@ export default defineComponent({
     const contract = computed(() => store.state.contract)
     return { address, contract, balance }
   },
+  
   data() {
     const account = null
     const username = ''
-    return { account, username }
-  },
+    const nbProjects = 0
+    const projects = [""]
+    const display = false
+    return { account, username, nbProjects, projects, display}
+  },  
   methods: {
+
     async updateAccount() {
       const { address, contract } = this
       this.account = await contract.methods.user(address).call()
+    },
+    async getProjects() {
+      const { contract } = this
+      let res = new Array(this.nbProjects)
+      for (let i = 0; i < this.nbProjects; i++) {       
+        res[i] = await contract.methods.project(i).call()
+      }
+      this.projects = res
+    },
+    async updateProjects() {
+      const { contract } = this
+      this.nbProjects = await contract.methods.projectsLength().call()
+      this.getProjects()
+      this.display = true
     },
     async signUp() {
       const { contract, username } = this
@@ -73,6 +144,18 @@ export default defineComponent({
       const { contract } = this
       await contract.methods.addBalance(200).send()
       await this.updateAccount()
+    },
+    async createProject() {
+      const { contract } = this
+      await contract.methods.createProject("aaa").send()
+      await this.updateProjects()
+    },
+    async fundProject() {
+      const { contract, address } = this
+      await contract.methods.addBalanceToProject(200, 0, address).send()
+      await this.updateProjects()
+      await this.updateAccount()
+
     },
   },
   async mounted() {
