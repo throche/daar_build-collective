@@ -22,42 +22,51 @@
         :gradient="true"
       >
         <div class="explanations">
-          This data has been fetched from the blockchain. You started by
-          connecting MetaMask, and you fetched your data by reading the
-          blockchain. Try to modify the code to see what's happening!
-        </div>
-        <div class="explanations">
-          On your account on the contract, you have
-          {{ account.balance }} tokens. If you click
-          <button class="button-link" @click="addTokens">here</button>, you can
-          add some token to your account. Just give it a try! And think to put
-          an eye on Ganache!
+          <p>You currently have {{ account.balance }} tokens on your account. Add some tokens to your account here. Enjoy, it's Free!</p>
+          <p>Enter here the number of token to receive :</p>
+          <form @submit.prevent="addTokens">
+            <input
+            type="text"
+            class="input-username"
+            v-model="newTokens"
+            placeholder="Amount"
+            />
+          </form>
         </div>
       </card>
     </div>
 
     <div class="card-home-wrapper">
       <card
-        :title="account.username"
-        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :title="'Create a new projet'"
+        :subtitle="'Take the lead !'"
         :gradient="true"
+        :blue="true"
       >
         <div class="explanations">
-          You can now create a project   
-          <button class="button-link" @click="createProject">here</button>.             
+          <p>You can now create a project</p>
+          <form @submit.prevent="createProject">
+            <input
+            type="text"
+            class="input-username"
+            v-model="project_name"
+            placeholder="Type the project name here"
+            />
+          </form>
         </div>
         
       </card>
     </div>
     <div class="card-home-wrapper">
       <card
-        :title="account.username"
-        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :title="'List all projects'"
+        :subtitle="'Get inspired !'"
         :gradient="true"
+        :blue="true"
       >
         <div class="explanations">
-          Here is the project list : 
-          <button class="button-link" @click="updateProjects">diplay projects</button>.             
+          
+          <button class="button-link" @click="updateProjects">Refresh project list here</button>             
            <div class="explanations" v-if="display">
 
             <div class="explanations" v-for="(p, index) in projects"
@@ -76,9 +85,10 @@
     </div>
     <div class="card-home-wrapper">
       <card
-        :title="account.username"
-        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :title="'Found a project'"
+        :subtitle="'Become a collaborator !'"
         :gradient="true"
+        :blue="true"
       >
         <div class="explanations">
           You can fund a project  
@@ -108,10 +118,12 @@ export default defineComponent({
   data() {
     const account = null
     const username = ''
+    const project_name = ''
     const nbProjects = 0
     const projects = [""]
     const display = false
-    return { account, username, nbProjects, projects, display}
+    const newTokens = 0
+    return { account, username, project_name, nbProjects, projects, display, newTokens}
   },  
   methods: {
 
@@ -141,14 +153,16 @@ export default defineComponent({
       this.username = ''
     },
     async addTokens() {
-      const { contract } = this
-      await contract.methods.addBalance(200).send()
+      const { contract, newTokens } = this
+      await contract.methods.addBalance(newTokens).send()
       await this.updateAccount()
     },
     async createProject() {
-      const { contract } = this
-      await contract.methods.createProject("aaa").send()
+      const { contract, project_name } = this
+      const p_name = project_name.trim().replace(/ /g, '_')
+      await contract.methods.createProject(p_name).send()
       await this.updateProjects()
+      this.project_name = ''
     },
     async fundProject() {
       const { contract, address } = this

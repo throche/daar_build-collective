@@ -108,7 +108,15 @@ You’re good to go!
 
 # Lancement du projet manuellement (alternative) #
 
+Lancer le software Ganache, c'est la blockchain en local
+./ganache-2.5.4-linux-x86_64.AppImage
 
+Puis ouvrir un terminal dans 'build-collective-master' :
+yarn serve
+
+Puis ouvrir dans un browser : localhost:8080
+
+a modifier: 
 
 ### Pour faire X : ###
 
