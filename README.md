@@ -108,6 +108,8 @@ ajout des structures de données et des fonctions suivantes :
   function addBalanceToProjectUsingEntreprise(uint256 amount, string memory projectName, string memory entrepriseName) public returns (bool);
   function isCollaboratorEntreprise(uint projectIndex, string memory entrepriseName) private view returns (bool);
 
+  function bountiesLength(string memory projectName) public view returns (uint);
+  function bounty(uint bountyId, string memory projectName) public view returns (Bounty memory);
   function createBounty(string memory projectName, string memory description, uint reward) public returns (bool);
   function solveBounty(string memory projectName, uint bountyId, string memory correction) public returns (bool);
 

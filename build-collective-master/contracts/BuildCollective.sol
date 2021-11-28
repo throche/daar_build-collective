@@ -40,12 +40,15 @@ contract BuildCollective is Ownable {
   }
 
   mapping(address => User) private users;
+
   mapping(uint => Project) private projects;
   uint private projectCount;
+
   mapping(uint => Entreprise) private entreprises;
   uint private entrepriseCount;
-  mapping(uint => mapping(uint => Bounty)) bounties; 
-  mapping(uint => uint) bountiesNumber; 
+
+  mapping(uint => mapping(uint => Bounty)) bounties;
+  mapping(uint => uint) bountiesNumber; // number of bounties for each project
 
   event UserSignedUp(address indexed userAddress, User indexed user);
   event ProjectCreated(uint indexed projectIndex, Project indexed project);
