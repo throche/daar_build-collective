@@ -18,7 +18,7 @@
     <div class="card-home-wrapper">
       <card
         :title="account.username"
-        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :subtitle="`${balance} \t\tΞ\t${account.balance} Tokens`"
         :gradient="true"
       >
         <div class="explanations">
@@ -33,19 +33,19 @@
             />
           </form>
         </div>
-      </card>
+      </card> 
     </div>
 
     <div class="card-home-wrapper">
       <card
-        :title="'Create a new projet'"
+        :title="'Create a new project'"
         :subtitle="'Take the lead !'"
         :gradient="true"
         :blue="true"
       >
         <div class="explanations">
           <p>
-          Create a new project by entering its name bellow. The project will be listed among the other projects. Every project has a balance account which contributors can fund.</p>
+          Create a new project by entering its name below then pressing enter. The project will be listed among the other projects. Every project has a balance account which contributors can fund.</p>
           <form @submit.prevent="createProject">
             <input
             type="text"
@@ -87,7 +87,7 @@
     <div class="card-home-wrapper">
       <card
         :title="'Fund a project'"
-        :subtitle="'Become a collaborator !'"
+        :subtitle="`Become a collaborator ! \t\tΞ\t${account.balance} Tokens`"
         :gradient="true"
         :blue="true"
       >
