@@ -111,6 +111,39 @@
 
       </card>
     </div>
+    <div class="card-home-wrapper">
+      <card
+        :title="'Allocate budget from your project'"
+        :subtitle="`It's payday !`"
+        :gradient="true"
+        :blue="true"
+      >
+        <div class="explanations">
+          <p>Project creator can transfer tokens to collaborators only.</p>
+          <p>Enter the name of the project which you want to transfer funds from and the amount.</p>
+          <input
+          type="text"
+          class="input-username"
+          v-model="project_name"
+          placeholder="Type exact project name"
+          />
+          <input
+          type="text"
+          class="input-username"
+          v-model="addrReceiver"
+          placeholder="Type collaborator address here (starts with 0x)"
+          />
+          <input
+          type="text"
+          class="input-username"
+          v-model="budget"
+          placeholder="Type amount here"
+          />
+          <button class="button-link" @click="allocateProjectBudget">Confirm</button>         
+        </div>
+
+      </card>
+    </div>
   </div>
 </template>
 
@@ -138,7 +171,9 @@ export default defineComponent({
     const display = false
     const newTokens = 0
     const donation = 0
-    return { account, username, project_name, nbProjects, projects, display, newTokens, donation}
+    const budget = 0
+    const addrReceiver = ''
+    return { account, username, project_name, nbProjects, projects, display, newTokens, donation, budget, addrReceiver}
   },  
   methods: {
 
@@ -180,12 +215,21 @@ export default defineComponent({
       this.project_name = ''
     },
     async fundProject() {
-      const { contract, address, project_name, donation} = this
-      await contract.methods.addBalanceToProject(donation, project_name, address).send()
+      const { contract, project_name, donation} = this
+      await contract.methods.addBalanceToProject(donation, project_name).send()
       await this.updateProjects()
       await this.updateAccount()
       this.project_name = ''
       this.donation = 0
+    },
+    async allocateProjectBudget() {
+      const { contract, addrReceiver, project_name, budget} = this
+      await contract.methods.allocateProjectBudget(budget, project_name, addrReceiver).send()
+      await this.updateProjects()
+      await this.updateAccount()
+      this.project_name = ''
+      this.budget = 0
+      this.addrReceiver = ''
     },
   },
   async mounted() {
