@@ -16,6 +16,7 @@ contract BuildCollective is Ownable {
     uint256 balance;
     bool registered;
     address[] collaborators;
+    uint collaboratorsNumber;
   }
 
   mapping(address => User) private users;
@@ -51,26 +52,37 @@ contract BuildCollective is Ownable {
 
   function createProject(string memory projectName) public returns (Project memory) {
     require(bytes(projectName).length > 0);
-    projects[projectCount] = Project(projectName, msg.sender, 0, true, new address[](5));
+    projects[projectCount] = Project(projectName, msg.sender, 0, true, new address[](1), 1);
     projects[projectCount].collaborators[0] = msg.sender;
     emit ProjectCreated(projectCount, projects[projectCount]);
     projectCount++;
   }
 
+  
   function addBalanceToProject(uint256 amount, string memory projectName, address addr) public returns (bool) {
     require(users[addr].balance >= amount);
     bool exist;
     uint projectIndex;
     (exist,projectIndex) = getProjectIndex(projectName);
-    if(exist) {
-      require(isCollaborator(projectIndex, addr));
-      projects[projectIndex].balance += amount;
-      users[addr].balance -= amount;
-      return true;
+    require(exist);  // will throw an error if the projectName doesn't exist
+    projects[projectIndex].balance += amount;
+    users[addr].balance -= amount;
+    
+    // if the user isn't among the collaborators, add him to the collaborators array
+    if (isCollaborator(projectIndex, addr) == false){
+    	// copy the collaborator array in a bigger array
+    	address[] memory newCollaborators = new address[](projects[projectIndex].collaboratorsNumber + 1);
+    	for (uint i = 0; i < projects[projectIndex].collaboratorsNumber; i++){
+    	  newCollaborators[i] = projects[projectIndex].collaborators[i];      	  
+    	}
+    	newCollaborators[projects[projectIndex].collaboratorsNumber] = addr; // add the new collaborator at the end
+    	projects[projectIndex].collaborators = newCollaborators;
+    	projects[projectIndex].collaboratorsNumber++;
     }
-    return false;
+    return true;    
   }
 
+  // retrieve project index using project name
   function getProjectIndex(string memory projectName) private returns (bool,uint){
     for(uint i = 0; i < projectCount; i++){
       if (stringsEquals(projects[i].projectName, projectName)){
@@ -80,8 +92,9 @@ contract BuildCollective is Ownable {
     return (false,0);
   }
 
+  // search if an address is among the collaborators of a project
   function isCollaborator(uint projectIndex, address addr) private returns (bool){
-    for(uint i = 0; i < 5; i++){
+    for(uint i = 0; i < projects[projectIndex].collaboratorsNumber; i++){
       if (projects[projectIndex].collaborators[i] == addr){
         return true;
       }
@@ -98,6 +111,21 @@ contract BuildCollective is Ownable {
         if (b1[i] != b2[i]) return false;
     }
     return true;
-}
-
+  }
+  
+  // function to send tokens from a project to one of the collaborators.
+  // can only be done by the creator of the project.
+  function allocateProjectBudget(uint256 amount, string memory projectName, address addr) public returns (bool) {
+    bool exist;
+    uint projectIndex;
+    (exist,projectIndex) = getProjectIndex(projectName);
+    require(exist);  // error if the projectName doesn't exist
+    require(projects[projectIndex].balance >= amount); // error if the project doesn't have enough funds to send
+    require(msg.sender == projects[projectIndex].creatorUser); // error if the function isn't called by the creator of the project
+    require(isCollaborator(projectIndex, addr)); // error if the receiver isn't among the collaborators
+    
+    projects[projectIndex].balance -= amount;
+    users[addr].balance += amount;
+    return true;
+  }
 }
