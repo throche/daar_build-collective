@@ -77,12 +77,6 @@ L'ensemble des interactions sont validées/rejetées par les contrats (solidity)
 ![Screenshot usecase 2](https://user-images.githubusercontent.com/36344463/143784497-c476edc1-4ae9-4e19-b759-3cec29b8e277.png)
 
 
-![Screenshot usecase_1](https://github.com/throche/daar_build-collective/screenshots/usecase_1.png)
-
-
-![Screenshot usecase_2](https://github.com/throche/daar_build-collective/screenshots/usecase_2.png)
-
-
 # Fichiers modifiés depuis le code source #
 
 Le front end `daar_build-collective/build-collective-master/src/views/Account.vue`
