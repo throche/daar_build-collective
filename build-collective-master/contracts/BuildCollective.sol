@@ -291,7 +291,28 @@ contract BuildCollective is Ownable {
 
 
   // ------------------- Bounty functions ---------------------------
- 
+
+  // returns the number of bounties for a project
+  function bountiesLength(string memory projectName) public view returns (uint) {
+    bool exist;
+    uint projectIndex;
+    (exist,projectIndex) = getProjectIndex(projectName);
+    require(exist);  // error if the projectName doesn't exist
+    
+    return bountiesNumber[projectIndex];    
+  }
+
+  // returns the selected bounty of the selected project
+  function bounty(uint bountyId, string memory projectName) public view returns (Bounty memory) {
+    bool exist;
+    uint projectIndex;
+    (exist,projectIndex) = getProjectIndex(projectName);
+    require(exist);  // error if the projectName doesn't exist
+    require(bountyId < bountiesNumber[projectIndex]); // error if selecting a bountyId not in the list
+    
+    return bounties[projectIndex][bountyId];
+  }
+
   // create a bounty with the description of the bug and the reward 
   function createBounty(string memory projectName, string memory description, uint reward) public returns (bool) {
     bool exist;
@@ -303,7 +324,7 @@ contract BuildCollective is Ownable {
     
     uint bountyCount = bountiesNumber[projectIndex];
     bounties[projectIndex][bountyCount] = Bounty(description, reward, "", true);
-
+    bountiesNumber[projectIndex]++;
     return true;
   }
 

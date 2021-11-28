@@ -334,6 +334,35 @@
 
     <div class="card-home-wrapper">
       <card
+        :title="'Bounty : List current bounties'"
+        :subtitle="'See where your skills are needed !'"
+        :gradient="true"
+        :blue="false"
+      >
+        <div class="explanations">
+          <input
+          type="text"
+          class="input-username"
+          v-model="project_name"
+          placeholder="Type the project name here"
+          />
+          <button class="button-link" @click="updateBounties">Refresh bounties list here</button>
+           <div class="explanations" v-if="displayBounties">
+            <div class="explanations" v-for="(b, index) in bounties"
+              :key="index">
+                ID : {{index}}<br>
+                description : {{b.description}}<br>
+                reward : {{b.reward}}<br>
+                available : {{b.available}}<br>
+                solution : {{b.solution}}<br>
+            </div>  
+            </div>  
+        </div>
+      </card>
+    </div>
+
+    <div class="card-home-wrapper">
+      <card
         :title="'Bounty : Solve a bounty'"
         :subtitle="`The american dream !\tΞ\t${account.balance} Tokens`"
         :gradient="true"
@@ -390,9 +419,12 @@ export default defineComponent({
     const project_name = ''
     const nbProjects = 0
     const nbEnterprises = 0
+    const nbBounties = 0
     const projects = [""]
     const enterprises = [""]
+    const bounties = [""]
     const display = false
+    const displayBounties = false
     const newTokens = 0
     const donation = 0
     const budget = 0
@@ -401,7 +433,7 @@ export default defineComponent({
     const bountyDescription = ''
     const bountyCorrection = ''
     const bountyID = 0
-    return { account, username, project_name, nbProjects, nbEnterprises, projects, enterprises, display, newTokens, donation, budget, addrReceiver, enterpriseName, bountyDescription, bountyCorrection, bountyID}
+    return { account, username, project_name, nbProjects, nbEnterprises, nbBounties, projects, enterprises, bounties, display, displayBounties, newTokens, donation, budget, addrReceiver, enterpriseName, bountyDescription, bountyCorrection, bountyID}
   },  
   methods: {
 
@@ -436,6 +468,20 @@ export default defineComponent({
       this.nbProjects = await contract.methods.projectsLength().call()
       this.getProjects()
       this.display = true
+    },
+    async getBounties() {
+      const { contract } = this
+      let res = new Array(this.nbBounties)
+      for (let i = 0; i < this.nbBounties; i++) {       
+        res[i] = await contract.methods.bounty(i, this.project_name).call()
+      }
+      this.bounties = res
+    },
+    async updateBounties() {
+      const { contract } = this
+      this.nbBounties = await contract.methods.bountiesLength(this.project_name).call()
+      this.getBounties()
+      this.displayBounties = true
     },
     async signUp() {
       const { contract, username } = this
@@ -512,6 +558,8 @@ export default defineComponent({
       const { contract, project_name, budget, bountyDescription} = this
       await contract.methods.createBounty(project_name, bountyDescription, budget).send()
       await this.updateProjects()
+      await this.updateBounties()
+      this.displayBounties = false
       this.project_name = ''
       this.budget = 0
       this.bountyDescription = ''
@@ -521,6 +569,8 @@ export default defineComponent({
       await contract.methods.solveBounty(project_name, bountyID, bountyCorrection).send()
       await this.updateProjects()
       await this.updateAccount()
+      await this.updateBounties()
+      this.displayBounties = false
       this.project_name = ''
       this.bountyID = 0
       this.bountyCorrection = ''
