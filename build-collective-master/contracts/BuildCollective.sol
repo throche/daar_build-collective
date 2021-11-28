@@ -67,6 +67,8 @@ contract BuildCollective is Ownable {
     return true;
   }
 
+  // ----------- Project functions -----------------------
+
   function projectsLength() public view returns (uint) {
     return projectCount;
   }

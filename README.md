@@ -49,26 +49,67 @@ ajout des structures de données et des fonctions suivantes :
 
 ```solidity
 
+  struct Entreprise {
+    string name;
+    address owner;
+    uint256 balance;
+    bool registered;
+    address[] members;
+    uint membersNumber;
+  }
+
   struct Project {
     string projectName;
+    uint creatorType;  
     address creatorUser;
+    string creatorEntreprise;
     uint256 balance;
     bool registered;
     address[] collaborators;
     uint collaboratorsNumber;
+    string[] collaboratorsEntreprise;
+    uint collaboratorsEntrepriseNumber;
   }
-  
+
+  struct Bounty {
+    string description;
+    uint reward;
+    string solution;
+    bool available;
+  }
+
   mapping(uint => Project) private projects;
   uint private projectCount;
+  
+  mapping(uint => Entreprise) private entreprises;
+  uint private entrepriseCount;
+  
+  mapping(uint => mapping(uint => Bounty)) bounties; 
+  mapping(uint => uint) bountiesNumber; 
 
+  
   function projectsLength() public view returns (uint);
   function project(uint projectIndex) public view returns (Project memory);
   function createProject(string memory projectName) public returns (Project memory);
-  function addBalanceToProject(uint256 amount, string memory projectName, address addr) public returns (bool);
-  function getProjectIndex(string memory projectName) private returns (bool,uint);
-  function isCollaborator(uint projectIndex, address addr) private returns (bool);
+  function addBalanceToProject(uint256 amount, string memory projectName) public returns (bool);
+  function getProjectIndex(string memory projectName) private view returns (bool,uint);
+  function isCollaborator(uint projectIndex, address addr) private view returns (bool);
   function stringsEquals(string memory s1, string memory s2) private pure returns (bool);
   function allocateProjectBudget(uint256 amount, string memory projectName, address addr) public returns (bool);
+
+  function entreprisesLength() public view returns (uint);
+  function entreprise(uint entrepriseIndex) public view returns (Entreprise memory);
+  function createEntreprise(string memory entrepriseName) public returns (Entreprise memory);
+  function getEntrepriseIndex(string memory entrepriseName) private view returns (bool,uint);
+  function joinEntreprise(string memory entrepriseName) public returns (bool);
+  function isMember(uint entrepriseIndex, address addr) private view returns (bool);
+  function addBalanceToEntreprise(uint256 amount, string memory entrepriseName) public returns (bool);
+  function createProjectEntreprise(string memory projectName, string memory entrepriseName) public returns (Project memory);
+  function addBalanceToProjectUsingEntreprise(uint256 amount, string memory projectName, string memory entrepriseName) public returns (bool);
+  function isCollaboratorEntreprise(uint projectIndex, string memory entrepriseName) private view returns (bool);
+
+  function createBounty(string memory projectName, string memory description, uint reward) public returns (bool);
+  function solveBounty(string memory projectName, uint bountyId, string memory correction) public returns (bool);
 
 ```
 
