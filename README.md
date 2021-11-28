@@ -21,31 +21,86 @@ Paul NGUYEN DIT SYVALA
 `paul.nguyen_dit_syvala@etu.sorbonne-universite.fr`
 
 
+# Installation #
 
-# Cas d'utilisations #
+Lire le `README.md` dans le dossier `build-collective-master`.
+
+
+# Lancement du projet manuellement #
+
+Après une installation réussie:
+
+1) Lancer la blockchain en local avec le software Ganache:
+
+```bash
+./ganache-2.5.4-linux-x86_64.AppImage
+```
+
+2) Republier les contrats puis lancer le frontend depuis un terminal dans 'build-collective-master' :
+
+```bash
+yarn contracts:migrate
+
+yarn serve
+```
+
+# Visualisation #
 
 On utilise meta mask pour choisir un compte parmi les comptes de la blockchain.
 
 On se connecte depuis `http://localhost:8080` pour accéder à un compte.
 
-On peut s'ajouter des tokens.
 
-On peut créer un projet.
+# Cas d'utilisations #
 
-On peut lister les projets.
+Toutes les fonctionnalités se font via le site, à travers des cartes, chacune représentant un cas d'utilisation possible.
 
-On peut faire des donations de tokens à un projet et devenir un collaborateur du projet.
+L'ensemble des interactions sont validées/rejetées par les contrats (solidity) sur la blockchain.
 
-On peut allouer des fonds d'un projet à un collaborateur
+
+**Définition** : un `utilisateur` représente une personne qui gère son propre compte, à titre privé.
+
+**Définition** : une `entreprise` représente une personne qui gère le compte d'une entreprise.
+
+**Gestion des comptes privés (cartes violettes):**
+
+- Un utilisateur peut se connecter à son compte.
+- Un utilisateur peut verser le montant qu'il souhaite sur son compte.
+
+**Gestion des entreprises (cartes bleus):**
+
+- Un utilisateur peut créer une entreprise et devenir son CEO.
+- Un utilisateur peut rejoindre une entreprise et devenir un membre de l'entreprise.
+- Un utiliateur peut lister toutes les entreprises.
+
+- Une entreprise peut créer un projet et en devenir le propriétaire.
+- Une entreprise peut financer un projet et en devenir un collaborateur.
+- Un membre de l'entreprise peut ajoute des fonds à son entreprise.
+
+**Gestion des projets:**
+
+- Un utilisateur/entreprise peut créer un nouveau projet avec un nom et un compte associé.
+- Un utilisateur/entreprise peut financer n'importe quel projet et ainsi devenir collaborateur.
+- Un utilisateur/entreprise peut afficher la liste des projets, avec leurs informations relatives.
+- Un utilisateur/entreprise qui est le créateur d'un projet, peut reverser une contribution du projet aux collaborateurs.
+
+**Gestion des bounties:**
+
+- Un utilisateur propriétaire d'un projet peut créer des bounties avec des récompenses.
+- Un utilisateur peut lister les bounties en cours avec leur descriptions.
+- Un utilisateur peut résolver une bounty et gagner des tokens.
+
+# Screenshots du site en cours d'utilisation #
+
 
 
 # Fichiers modifiés depuis le code source #
 
-le front end `daar_build-collective/build-collective-master/src/views`
+Le front end `daar_build-collective/build-collective-master/src/views/Account.vue`
 
-le contrat `daar_build-collective/build-collective-master/contracts`
+Le contrat `daar_build-collective/build-collective-master/contracts/BuildCollective.sol`
 
-ajout des structures de données et des fonctions suivantes :
+Ajout des structures de données et des fonctions suivantes :
 
 ```solidity
 
@@ -115,34 +170,5 @@ ajout des structures de données et des fonctions suivantes :
 
 ```
 
-# Installation #
-
-Lire le `README.md` dans le dossier `build-collective-master`.
 
 
-# Lancement du projet manuellement #
-
-1) Lancer la blockchain en local avec le software Ganache:
-
-```bash
-./ganache-2.5.4-linux-x86_64.AppImage
-```
-
-2) Lancer le frontend depuis un terminal dans 'build-collective-master' :
-
-```bash
-republier les contrats
-yarn contracts:migrate
-
-lancer le frontend:
-yarn serve
-```
-
-# Visualisation #
-
-Pour le front-end : 
-
-`http://localhost:8080`
-
-
-# Conclusion et remarques #
