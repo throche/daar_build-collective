@@ -32,11 +32,20 @@ contract BuildCollective is Ownable {
     uint collaboratorsEntrepriseNumber;
   }
 
+  struct Bounty {
+    string description;
+    uint reward;
+    string solution;
+    bool available;
+  }
+
   mapping(address => User) private users;
   mapping(uint => Project) private projects;
   uint private projectCount;
   mapping(uint => Entreprise) private entreprises;
   uint private entrepriseCount;
+  mapping(uint => mapping(uint => Bounty)) bounties; 
+  mapping(uint => uint) bountiesNumber; 
 
   event UserSignedUp(address indexed userAddress, User indexed user);
   event ProjectCreated(uint indexed projectIndex, Project indexed project);
@@ -99,7 +108,7 @@ contract BuildCollective is Ownable {
   }
 
   // retrieve project index using project name
-  function getProjectIndex(string memory projectName) private returns (bool,uint){
+  function getProjectIndex(string memory projectName) private view returns (bool,uint){
     for(uint i = 0; i < projectCount; i++){
       if (stringsEquals(projects[i].projectName, projectName)){
         return (true,i);
@@ -109,7 +118,7 @@ contract BuildCollective is Ownable {
   }
 
   // search if an address is among the collaborators of a project
-  function isCollaborator(uint projectIndex, address addr) private returns (bool){
+  function isCollaborator(uint projectIndex, address addr) private view returns (bool){
     for(uint i = 0; i < projects[projectIndex].collaboratorsNumber; i++){
       if (projects[projectIndex].collaborators[i] == addr){
         return true;
@@ -145,7 +154,7 @@ contract BuildCollective is Ownable {
     return true;
   }
 
-  // Entreprise functions
+  // ------------------- Entreprise functions -----------------------------
 
   function entreprisesLength() public view returns (uint) {
     return entrepriseCount;
@@ -164,28 +173,13 @@ contract BuildCollective is Ownable {
   }
 
   // retrieve entreprise index using entreprise name
-  function getEntrepriseIndex(string memory entrepriseName) private returns (bool,uint){
+  function getEntrepriseIndex(string memory entrepriseName) private view returns (bool,uint){
     for(uint i = 0; i < entrepriseCount; i++){
       if (stringsEquals(entreprises[i].name, entrepriseName)){
         return (true,i);
       }
     }
     return (false,0);
-  }
-
-  // the entreprise owner can create a project using his entreprise
-  function createProjectEntreprise(string memory projectName, string memory entrepriseName) public returns (Project memory) {
-    require(bytes(projectName).length > 0);
-    require(bytes(entrepriseName).length > 0);
-    bool exist;
-    uint entrepriseIndex;
-    (exist,entrepriseIndex) = getEntrepriseIndex(entrepriseName); 
-    require (exist); // error if the entreprise doesn't exist
-    require(entreprises[entrepriseIndex].owner == msg.sender); // error if the person creating the entreprise project isn't the owner
-    projects[projectCount] = Project(projectName, 1, msg.sender, entrepriseName, 0, true, new address[](0), 0, new string[](1), 1);
-    projects[projectCount].collaboratorsEntreprise[0] = entrepriseName;
-    emit ProjectCreated(projectCount, projects[projectCount]);
-    projectCount++;
   }
 
   // join an existing entreprise
@@ -209,7 +203,7 @@ contract BuildCollective is Ownable {
   }
 
   // search if an address is among the members of an entreprise
-  function isMember(uint entrepriseIndex, address addr) private returns (bool){
+  function isMember(uint entrepriseIndex, address addr) private view returns (bool){
     for(uint i = 0; i < entreprises[entrepriseIndex].membersNumber; i++){
       if (entreprises[entrepriseIndex].members[i] == addr){
         return true;
@@ -230,5 +224,101 @@ contract BuildCollective is Ownable {
     users[msg.sender].balance -= amount;
     
     return true;    
+  }
+
+  // the entreprise owner can create a project using his entreprise
+  function createProjectEntreprise(string memory projectName, string memory entrepriseName) public returns (Project memory) {
+    require(bytes(projectName).length > 0);
+    require(bytes(entrepriseName).length > 0);
+    bool exist;
+    uint entrepriseIndex;
+    (exist,entrepriseIndex) = getEntrepriseIndex(entrepriseName); 
+    require (exist); // error if the entreprise doesn't exist
+    require(entreprises[entrepriseIndex].owner == msg.sender); // error if the person creating the entreprise project isn't the owner
+    projects[projectCount] = Project(projectName, 1, msg.sender, entrepriseName, 0, true, new address[](0), 0, new string[](1), 1);
+    projects[projectCount].collaboratorsEntreprise[0] = entrepriseName;
+    emit ProjectCreated(projectCount, projects[projectCount]);
+    projectCount++;
+  }
+
+  // the entreprise owner can fund and existing project using his entreprise
+  function addBalanceToProjectUsingEntreprise(uint256 amount, string memory projectName, string memory entrepriseName) public returns (bool) {
+    require(bytes(projectName).length > 0);
+    require(bytes(entrepriseName).length > 0);
+    
+    bool exist;
+    uint entrepriseIndex;
+    (exist,entrepriseIndex) = getEntrepriseIndex(entrepriseName); 
+    require (exist); // error if the entreprise doesn't exist
+    
+    bool exist2;
+    uint projectIndex;
+    (exist2,projectIndex) = getProjectIndex(projectName);
+    require(exist2);  // error if the projectName doesn't exist
+    
+    require(entreprises[entrepriseIndex].owner == msg.sender); // error if the person sending funds isn't the entreprise owner
+    require(entreprises[entrepriseIndex].balance >= amount); // error if the entreprise doesn't have enough tokens
+
+    projects[projectIndex].balance += amount;
+    entreprises[entrepriseIndex].balance -= amount;
+
+    // if the entreprise isn't among the collaborators, add it to the collaboratorsEntreprise array
+    if (isCollaboratorEntreprise(projectIndex, entrepriseName) == false){
+    	// copy the collaboratorEntreprises array in a bigger array
+    	string[] memory newCollaborators = new string[](projects[projectIndex].collaboratorsEntrepriseNumber + 1);
+    	for (uint i = 0; i < projects[projectIndex].collaboratorsEntrepriseNumber; i++){
+    	  newCollaborators[i] = projects[projectIndex].collaboratorsEntreprise[i];      	  
+    	}
+    	newCollaborators[projects[projectIndex].collaboratorsEntrepriseNumber] = entrepriseName; // add the new entreprise at the end
+    	projects[projectIndex].collaboratorsEntreprise = newCollaborators;
+    	projects[projectIndex].collaboratorsEntrepriseNumber++;
+    }
+    return true;    
+  }
+
+
+  // search if an entreprise name is among the entreprises collaborators of a project
+  function isCollaboratorEntreprise(uint projectIndex, string memory entrepriseName) private view returns (bool){
+    for(uint i = 0; i < projects[projectIndex].collaboratorsEntrepriseNumber; i++){
+      if (stringsEquals(projects[projectIndex].collaboratorsEntreprise[i], entrepriseName)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  // ------------------- Bounty functions ---------------------------
+ 
+  // create a bounty with the description of the bug and the reward 
+  function createBounty(string memory projectName, string memory description, uint reward) public returns (bool) {
+    bool exist;
+    uint projectIndex;
+    (exist,projectIndex) = getProjectIndex(projectName);
+    require(exist);  // error if the projectName doesn't exist
+    require(projects[projectIndex].balance >= reward); // error if the project doesn't have enough funds to pay the bounty reward
+    require(msg.sender == projects[projectIndex].creatorUser); // error if the function isn't called by the creator of the project
+    
+    uint bountyCount = bountiesNumber[projectIndex];
+    bounties[projectIndex][bountyCount] = Bounty(description, reward, "", true);
+
+    return true;
+  }
+
+  // solve a bounty by giving the correction and receive the reward
+  function solveBounty(string memory projectName, uint bountyId, string memory correction) public returns (bool) {
+    bool exist;
+    uint projectIndex;
+    (exist,projectIndex) = getProjectIndex(projectName);
+    require(exist);  // error if the projectName doesn't exist
+    require(projects[projectIndex].balance >= bounties[projectIndex][bountyId].reward); // error if the project doesn't have enough funds to pay the bounty reward
+    require(bounties[projectIndex][bountyId].available); // error if the bounty has already been solved
+    
+    bounties[projectIndex][bountyId].solution = correction;
+    bounties[projectIndex][bountyId].available = false;
+    projects[projectIndex].balance -= bounties[projectIndex][bountyId].reward;
+    users[msg.sender].balance += bounties[projectIndex][bountyId].reward;
+          
+    return true;
   }
 }
