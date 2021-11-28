@@ -21,30 +21,10 @@ Paul NGUYEN DIT SYVALA
 `paul.nguyen_dit_syvala@etu.sorbonne-universite.fr`
 
 
-# Installation #
-
-Lire le `README.md` dans le dossier `build-collective-master`.
-
-
-# Lancement du projet manuellement #
-
-Après une installation réussie:
-
-1) Lancer la blockchain en local avec le software Ganache:
-
-```bash
-./ganache-2.5.4-linux-x86_64.AppImage
-```
-
-2) Republier les contrats puis lancer le frontend depuis un terminal dans 'build-collective-master' :
-
-```bash
-yarn contracts:migrate
-
-yarn serve
-```
 
 # Visualisation #
+
+*(installation et lancement du projet en fin de page)*
 
 On utilise meta mask pour choisir un compte parmi les comptes de la blockchain.
 
@@ -62,12 +42,12 @@ L'ensemble des interactions sont validées/rejetées par les contrats (solidity)
 
 **Définition** : une `entreprise` représente une personne qui gère le compte d'une entreprise.
 
-**Gestion des comptes privés (cartes violettes):**
+**Gestion des comptes privés:**
 
 - Un utilisateur peut se connecter à son compte.
 - Un utilisateur peut verser le montant qu'il souhaite sur son compte.
 
-**Gestion des entreprises (cartes bleus):**
+**Gestion des entreprises:**
 
 - Un utilisateur peut créer une entreprise et devenir son CEO.
 - Un utilisateur peut rejoindre une entreprise et devenir un membre de l'entreprise.
@@ -92,6 +72,15 @@ L'ensemble des interactions sont validées/rejetées par les contrats (solidity)
 
 # Screenshots du site en cours d'utilisation #
 
+![Screenshot usecase 1](https://user-images.githubusercontent.com/36344463/143784482-5d9b5b51-9927-47e0-be8f-8a9718d3aff2.png)
+
+![Screenshot usecase 2](https://user-images.githubusercontent.com/36344463/143784497-c476edc1-4ae9-4e19-b759-3cec29b8e277.png)
+
+
+![Screenshot usecase_1](https://github.com/throche/daar_build-collective/screenshots/usecase_1.png)
+
+
+![Screenshot usecase_2](https://github.com/throche/daar_build-collective/screenshots/usecase_2.png)
 
 
 # Fichiers modifiés depuis le code source #
@@ -171,4 +160,25 @@ Ajout des structures de données et des fonctions suivantes :
 ```
 
 
+# Installation #
 
+Lire le `README.md` dans le dossier `build-collective-master`.
+
+
+# Lancement du projet manuellement #
+
+Après une installation réussie:
+
+1) Lancer la blockchain en local avec le software Ganache:
+
+```bash
+./ganache-2.5.4-linux-x86_64.AppImage
+```
+
+2) Republier les contrats puis lancer le frontend depuis un terminal dans 'build-collective-master' :
+
+```bash
+yarn contracts:migrate
+
+yarn serve
+```
