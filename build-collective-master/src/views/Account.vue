@@ -242,13 +242,21 @@ export default defineComponent({
 
 <style lang="css" scoped>
 .home {
+  /*
   padding: 24px;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
+*/
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  grid-gap: 24px;
+  margin: auto;
+
 }
 
 .explanations {
