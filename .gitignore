@@ -2,6 +2,8 @@
 node_modules
 /dist
 
+build-collective-master/build/contracts/BuildCollective.json
+build-collective-master/build/contracts/Migrations.json
 
 # local env files
 .env.local
